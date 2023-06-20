@@ -76,7 +76,7 @@ function setStage(stage) {
 
 // COMMON WEBSOCKET STUFF
 function wssConnect() {
-    let socketHost = `${protocol}//${window.location.host}/iochatserver/`;
+    let socketHost = `${protocol}//${host}/iochatserver/`;
     if (flags.debug){
         socketHost = `http://${host}/`;
     }
