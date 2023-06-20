@@ -1,6 +1,6 @@
 //Подключение клиенсткой библиотеки Socket.io 
 function iolibPrepare(callback) {
-    let path = `http://${host}`;
+    let path = `${location.protocol}://${host}`;
     if (!flags.debug){
         path += "/iochatserver";
     }
