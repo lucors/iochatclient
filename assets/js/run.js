@@ -11,7 +11,7 @@ function iolibPrepare(callback) {
 // DOCUMENT READY EVENT
 //-------------------------------------------------------------------------------------------------------
 $(document).ready(function(){
-    if (!["http:", "https", "ws:"].includes(protocol)) {
+    if (!["http:", "https:", "ws:"].includes(protocol)) {
         protocol = "http:";
     }
     iolibPrepare(() => {
