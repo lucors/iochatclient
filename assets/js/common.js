@@ -97,7 +97,7 @@ function wssRecon() {
     if (currentStage === "chat" && nickname) {
         console.warn("Соединение восстановлено");
         chatPutMessage("notify", "Соединение восстановлено");
-        wssSendName(nickname);
+        wssSendName();
         clearRooms();
     }
 }
