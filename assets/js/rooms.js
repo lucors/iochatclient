@@ -14,6 +14,10 @@ function changeRoom() {
     currentRoom = $(this).attr("rid");
     wssSend("ROOM_CHANGE", currentRoom);
 }
+function clearRooms() {
+    $("#chat-rooms .room")
+        .each((i, elem) => elem.remove());
+}
 
 // ROOMS WEBSOCKET STUFF
 

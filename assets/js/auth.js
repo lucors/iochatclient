@@ -5,8 +5,13 @@
 
 
 // AUTH WEBSOCKET STUFF
-function wssSendName() {
-    nickname = $("#auth-input").val();
+function wssSendName(name = null) {
+    if (name) {
+        nickname = name;
+    }
+    else {
+        nickname = $("#auth-input").val();
+    }
     nickname = nickname.slice(0, 50);
     if (nickname.indexOf(' ') >= 0) {
         $("#auth-error").html("Не используйте пробел в имени");

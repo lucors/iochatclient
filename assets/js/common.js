@@ -82,9 +82,17 @@ function wssConnect() {
     socket = io(socketHost, {transports: ['websocket']});
     //Обработчики сокета
     socket.once("connect", wssOpen);
-    socket.once("disconnect", wssClose);
-    socket.once("error", wssError);
+    socket.on("disconnect", wssClose);
+    socket.on("error", wssError);
     socket.on("message", wssMessage);
+}
+function wssRecon() {
+    if (currentStage === "chat" && nickname) {
+        console.warn("Соединение восстановлено");
+        chatPutMessage("notify", "Соединение восстановлено");
+        wssSendName(nickname);
+        clearRooms();
+    }
 }
 function wssOpen() {
     $("#auth-send").click(wssSendName);
@@ -100,6 +108,7 @@ function wssOpen() {
                 $("#auth-input").focus();
         }
     });
+    socket.on("connect", wssRecon);
 }
 function wssClose(event) {
     if ($("#auth-error").html() !== "Ошибка соединения"){
