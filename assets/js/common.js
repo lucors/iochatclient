@@ -89,6 +89,7 @@ function wssConnect() {
     //Обработчики сокета
     socket.once("connect", wssOpen);
     socket.on("disconnect", wssClose);
+    socket.on("connect_error", wssError);
     socket.on("error", wssError);
     socket.on("message", wssMessage);
 }
