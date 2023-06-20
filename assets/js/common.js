@@ -76,11 +76,16 @@ function setStage(stage) {
 
 // COMMON WEBSOCKET STUFF
 function wssConnect() {
-    let socketHost = `${protocol}//${host}/iochatserver/`;
+    let socketHost = `${protocol}//${host}`;
+    const socketOptions = {
+        path: "/iochatserver/socket.io",
+        transports: ['websocket']
+    };
     if (flags.debug){
-        socketHost = `http://${host}/`;
+        socketOptions.path = "";
+        socketHost = `http://${host}`;
     }
-    socket = io(socketHost, {transports: ['websocket']});
+    socket = io(socketHost, socketOptions);
     //Обработчики сокета
     socket.once("connect", wssOpen);
     socket.on("disconnect", wssClose);
