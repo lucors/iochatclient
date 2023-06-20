@@ -1,5 +1,5 @@
-# <em>lucors presents</em> <strong>WebSocket Chat</strong>
+# <em>lucors presents</em> <strong>Socket.io Chat</strong>
 
-![wsChat logotype](assets/img/github-wsclogo.png)<br>
-A simple chat built on WebSockets technology<br>
-Also check [wschatserver](https://github.com/lucors/wschatserver)
+![wsChat logotype](assets/img/github-ioclogo.png)<br>
+A simple chat built on Socket.io library<br>
+Also check [wschatserver](https://github.com/lucors/iochatserver)
