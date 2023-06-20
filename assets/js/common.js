@@ -1,6 +1,7 @@
 ﻿// COMMON VARIABLES
 let nickname = "";
 let host = window.location.host || "localhost:9000";
+let protocol = window.location.protocol;
 let hue = 0;
 let socket = null;
 let wssMessageHandlers = []; //[{mode: string, func: function()},...]
@@ -75,7 +76,7 @@ function setStage(stage) {
 
 // COMMON WEBSOCKET STUFF
 function wssConnect() {
-    let socketHost = `${location.protocol}//${window.location.host}/iochatserver/`;
+    let socketHost = `${protocol}//${window.location.host}/iochatserver/`;
     if (flags.debug){
         socketHost = `http://${host}/`;
     }

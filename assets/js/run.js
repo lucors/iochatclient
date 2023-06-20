@@ -1,6 +1,6 @@
 //Подключение клиенсткой библиотеки Socket.io 
 function iolibPrepare(callback) {
-    let path = `${location.protocol}://${host}`;
+    let path = `${protocol}//${host}`;
     if (!flags.debug){
         path += "/iochatserver";
     }
@@ -11,6 +11,9 @@ function iolibPrepare(callback) {
 // DOCUMENT READY EVENT
 //-------------------------------------------------------------------------------------------------------
 $(document).ready(function(){
+    if (!["http:", "https", "ws:"].includes(protocol)) {
+        protocol = "http:";
+    }
     iolibPrepare(() => {
         mobilePrepare();
         setStage("auth");
