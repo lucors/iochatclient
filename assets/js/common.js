@@ -1,5 +1,6 @@
 ﻿// COMMON VARIABLES
 let nickname = "";
+let host = window.location.host || "localhost:9000";
 let hue = 0;
 let socket = null;
 let wssMessageHandlers = []; //[{mode: string, func: function()},...]
@@ -20,7 +21,7 @@ let stages = {
     },
 };
 let flags = {
-    debug: false,
+    debug: (host === "localhost:9000"),
     admin: false,
 }
 
@@ -74,17 +75,16 @@ function setStage(stage) {
 
 // COMMON WEBSOCKET STUFF
 function wssConnect() {
+    let socketHost = `https://${window.location.host}/iochatserver/`;
     if (flags.debug){
-        socket = new WebSocket("ws://127.0.0.1:9000");
+        socketHost = `http://${host}/`;
     }
-    else {
-        socket = new WebSocket("wss://lucors.ru/wschatserver/");
-    }
+    socket = io(socketHost, {transports: ['websocket']});
     //Обработчики сокета
-    socket.onopen = wssOpen;
-    socket.onclose = wssClose;
-    socket.onerror = wssError;
-    socket.onmessage = wssMessage;
+    socket.once("connect", wssOpen);
+    socket.once("disconnect", wssClose);
+    socket.once("error", wssError);
+    socket.on("message", wssMessage);
 }
 function wssOpen() {
     $("#auth-send").click(wssSendName);
@@ -119,8 +119,8 @@ function wssError(event) {
 }
 function wssMessage(event) {
     try {
-        if (flags.debug) console.log(`%cr: ` + event.data, "color: #bada55");
-        const message = JSON.parse(event.data);
+        if (flags.debug) console.log(`%cr: ` + event, "color: #bada55");
+        const message = JSON.parse(event);
         const _done = wssMessageHandlers.some(handler => {
             if (handler.mode == message[0]) {
                 handler.func(message);

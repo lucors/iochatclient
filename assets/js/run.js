@@ -1,8 +1,18 @@
+//Подключение клиенсткой библиотеки Socket.io 
+function iolibPrepare(callback) {
+    let path = `http://${host}`;
+    if (!flags.debug){
+        path += "/iochatserver";
+    }
+    $.getScript(`${path}/socket.io/socket.io.min.js`, callback);
+}
+
 //-------------------------------------------------------------------------------------------------------
 // DOCUMENT READY EVENT
 //-------------------------------------------------------------------------------------------------------
 $(document).ready(function(){
-    flags.debug = !(document.location.host === "lucors.ru");
-    mobilePrepare();
-    setStage("auth");
+    iolibPrepare(() => {
+        mobilePrepare();
+        setStage("auth");
+    });
 });
