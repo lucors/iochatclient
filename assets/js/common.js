@@ -80,7 +80,7 @@ function wssConnect() {
     let socketHost = `${protocol}//${host}`;
     const socketOptions = {
         path: "/iochatserver/socket.io",
-        transports: ['websocket']
+        transports: ["websocket", "polling"]
     };
     if (flags.debug){
         socketOptions.path = "";
