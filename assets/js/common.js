@@ -52,6 +52,7 @@ function currentDatetime() {
 }
 // Обработка этапов
 function setStage(stage) {
+    if (stage == currentStage) return;
     if (!(stage in stages)) return;
     if (currentStage) {
         if (flags.debug) console.log(`%cЗавершение этапа: ${currentStage}`, "color: #F7AD6E");
