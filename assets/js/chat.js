@@ -89,46 +89,49 @@ function hint(val = undefined) {
 function generateHint(text) {
     hint("");
     if (!text) return;
+    try {
+        let reg = new RegExp(`^${text}`, 'g');
 
-    const lastw = text.split(" ").at(-1);
-    if (!lastw) return;
-    let reg = new RegExp(`^${lastw}`, 'g');
-
-    const _commHint = chatCommandsHandlers.some((handler) => {
-        if (reg.test(handler.command)) {
-            if (!handler.admin || (handler.admin && flags.admin)) {
-                hint(`${handler.command} `);
-                return true;
-            } 
-        }
-    });
-    if (_commHint) return;
-    //Пользователи
-    let membersSelector = "#chat-members .member";
-    if (flags.admin) {
-        membersSelector = "#chat-clients .member";
-    }
-    $.map($(membersSelector), function(e){return e.innerHTML})
-        .sort()
-        .some((v) => {
-            reg = new RegExp(`^${lastw}`, 'g');
-            if (reg.test(v)) {
-                const lastspace = text.lastIndexOf(" ");
-                if (lastspace < 0){
-                    hint(v);
+        const _commHint = chatCommandsHandlers.some((handler) => {
+            if (reg.test(handler.command)) {
+                if (!handler.admin || (handler.admin && flags.admin)) {
+                    hint(`${handler.command} `);
                     return true;
-                }
-                hint(text.slice(0, text.lastIndexOf(" ")+1) + v);
-                return true;
+                } 
             }
         });
+        if (_commHint) return;
+
+        //Пользователи
+        const lastw = text.split(" ").at(-1);
+        if (!lastw) return;
+        let membersSelector = "#chat-members .member";
+        if (flags.admin) {
+            membersSelector = "#chat-clients .member";
+        }
+        $.map($(membersSelector), function(e){return e.innerHTML})
+            .sort()
+            .some((v) => {
+                reg = new RegExp(`^${lastw}`, 'g');
+                if (reg.test(v)) {
+                    const lastspace = text.lastIndexOf(" ");
+                    if (lastspace < 0){
+                        hint(v);
+                        return true;
+                    }
+                    hint(text.slice(0, text.lastIndexOf(" ")+1) + v);
+                    return true;
+                }
+            });
+    }
+    catch (err){}
 }
 
 
 // CHAT WEBSOCKET STUFF
 function wssSendMessage() {
     if (nickname === "") return;
-    let message = $("#chat-input").val().slice(0, 2000);
+    let message = $("#chat-input").val().slice(0, 500);
     if (message === "") {
         console.warn("Не отправляйте пустые сообщения");
         return false;
@@ -227,7 +230,8 @@ wssMessageHandlers.push({
 // CHAT STAGE HANDLERS
 stages["chat"]["entry"] = function(){
     pingInterval = setInterval(()=> {
-        wssSend("PING");
+        socket.emit("test:ping");
+        // wssSend("PING");
     }, 30*1000);
 
     chatCommandsHandlers.forEach((handler) => {

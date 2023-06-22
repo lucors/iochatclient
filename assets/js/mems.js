@@ -93,8 +93,8 @@ wssMessageHandlers.push({
         </div> исключен
         `; 
         if (message[1] === nickname) {
-            msg = "Вас исключили из чата.<br>Перезагрузите страницу.";
-            console.warn("Вас исключили из чата. Перезагрузите страницу.");
+            msg = "Вас исключили из чата.";
+            console.warn("Вас исключили из чата.");
             socket.close();
             $(".member, .room").remove();
         }

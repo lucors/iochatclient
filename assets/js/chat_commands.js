@@ -7,10 +7,10 @@ chatCommandsHandlers.push({
             Доступны следующие команды:<br>
             @blur &lt;text&gt; — <i>отправить размытое сообщение;</i><br>
             @direct &lt;user&gt; &lt;text&gt; — <i>отправить личное сообщение;</i><br>
-            @hash &lt;text&gt; — <i>получить хэш строки;</i><br>
         `;
         if (flags.admin) {
             helpText += `
+            @hash &lt;text&gt; — <i>получить хэш строки;</i><br>
             @notify &lt;text&gt; — <i>отправить уведомление во все каналы;</i><br>
             @rnotify &lt;text&gt; — <i>отправить уведомление в этот канал;</i><br>
             @server &lt;text&gt; — <i>отправить сообщение от лица сервера;</i><br>

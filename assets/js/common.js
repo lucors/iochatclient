@@ -91,8 +91,10 @@ function wssConnect() {
     socket.once("connect", wssOpen);
     socket.on("disconnect", wssClose);
     socket.on("connect_error", wssError);
-    socket.on("error", wssError);
     socket.on("message", wssMessage);
+    socket.on("test:ping", function(message) {
+        console.log(`PING timestamp: ${message}`);
+    })
 }
 function wssRecon() {
     if (currentStage === "chat" && nickname) {
@@ -160,12 +162,12 @@ function wssSend(mode, data = undefined) {
 }
 
 // COMMON wssMessage HANDLERS
-wssMessageHandlers.push({
-    mode: "PING",
-    func: function(message){
-        console.log(`PING timestamp: ${message[1]}`);
-    }
-});
+// wssMessageHandlers.push({
+//     mode: "PING",
+//     func: function(message){
+//         console.log(`PING timestamp: ${message[1]}`);
+//     }
+// });
 wssMessageHandlers.push({
     mode: "ERROR",
     func: function(message){
