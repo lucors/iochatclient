@@ -18,7 +18,7 @@ function wssSendName() {
         $("#auth-error").html("Введите имя");
         return;
     }
-    wssSend("AUTH", nickname);
+    wssSend("auth:auth", nickname);
 }
 
 // AUTH wssMessage HANDLERS
@@ -47,7 +47,7 @@ wssMessageHandlers.push({
             $("#auth-error").html("Пароль не задан");
             return;
         }
-        wssSend("AUTH_PASS", [nickname, hashCode(pass)]);
+        wssSend("auth:pass", [nickname, hashCode(pass)]);
     }
 });
 

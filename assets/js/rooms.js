@@ -12,7 +12,7 @@ function putRoom(room) {
 function changeRoom() {
     $("#chat-rooms-error").html("");
     currentRoom = $(this).attr("rid");
-    wssSend("ROOM_CHANGE", currentRoom);
+    wssSend("room:change", currentRoom);
 }
 function clearRooms() {
     $("#chat-rooms .room")

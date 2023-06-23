@@ -155,10 +155,9 @@ function wssMessage(event) {
     }
 }
 function wssSend(mode, data = undefined) {
-    let msg = [mode];
-    if (data !== undefined) msg.push(data);
-    if (flags.debug) console.log(`%cs: ` + JSON.stringify(msg), "color: #77DDE7");
-    return socket.send(JSON.stringify(msg));
+    if (flags.debug) console.log(`%cs: ${mode}${(data === undefined) ? "" : "," + data}`, "color: #77DDE7");
+    if (data === undefined) return socket.emit(mode);
+    return socket.emit(mode, data);
 }
 
 // COMMON wssMessage HANDLERS

@@ -145,7 +145,7 @@ function wssSendMessage() {
         }
     });
     if (!_comm){
-        wssSend("MSG", message);
+        wssSend("msg:msg", message);
     }
     $("#chat-input").val("");
     return true;
@@ -153,13 +153,13 @@ function wssSendMessage() {
 function broadcastr(msg, rid=undefined) {
     if (!msg) return;
     if (rid === undefined) {
-        return wssSend("BROADCAST_R", msg);
+        return wssSend("msg:broadcast:room", msg);
     }
-    wssSend("BROADCAST_R", [rid, msg]);
+    wssSend("msg:broadcast:room", [rid, msg]);
 }
 function broadcast(msg) {
     if (!msg) return;
-    wssSend("BROADCAST", msg);
+    wssSend("msg:broadcast", msg);
 }
 
 // CHAT wssMessage HANDLERS
@@ -230,8 +230,7 @@ wssMessageHandlers.push({
 // CHAT STAGE HANDLERS
 stages["chat"]["entry"] = function(){
     pingInterval = setInterval(()=> {
-        socket.emit("test:ping");
-        // wssSend("PING");
+        wssSend("test:ping");
     }, 30*1000);
 
     chatCommandsHandlers.forEach((handler) => {

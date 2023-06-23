@@ -31,7 +31,7 @@ chatCommandsHandlers.push({
             console.warn("Не отправляйте пустые сообщения");
             return false;
         }
-        wssSend("MSG_BLUR", message);
+        wssSend("msg:blur", message);
     }
 });
 chatCommandsHandlers.push({
@@ -50,7 +50,7 @@ chatCommandsHandlers.push({
             return false;
         }
         //TODO: изменить механизм определения whom и части сообщения
-        wssSend("MSG_DIRECT", [whom[1], whom.slice(2).join(" ")]);
+        wssSend("msg:direct", [whom[1], whom.slice(2).join(" ")]);
     }
 });
 chatCommandsHandlers.push({
@@ -86,14 +86,14 @@ chatCommandsHandlers.push({
             console.warn("Не отправляйте пустые сообщения");
             return false;
         }
-        wssSend("MSG_SERVER", message);
+        wssSend("msg:server", message);
     }
 });
 chatCommandsHandlers.push({
     command: "@reconfig",
     admin: true,
     func: function(message){
-        wssSend("RELOAD_CONFIG");
+        wssSend("cfg:reload");
         chatPutMessage("server", "Ожидайте завершение конфигурации", {
             title: "Конфигурация"
         });
@@ -114,6 +114,6 @@ chatCommandsHandlers.push({
             console.warn("Ошибка kick, пользователь не определен");
             return false;
         }
-        wssSend("KICK", whom[1]);
+        wssSend("mem:kick", whom[1]);
     }
 });
