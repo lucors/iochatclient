@@ -162,70 +162,52 @@ function broadcast(msg) {
     wssSend("msg:broadcast", msg);
 }
 
-// CHAT wssMessage HANDLERS
-wssMessageHandlers.push({
-    mode: "NOTIFY",
-    func: function(message){
-        chatPutMessage("notify", message[1]);
-    }
-});
-wssMessageHandlers.push({
-    mode: "MSG",
-    func: function(message){
-        chatPutMessage(getMessageDir(message[1][0]), message[1][1], {
-            title:  message[1][0],
-            who:    message[1][0],
-        });
-    }
-});
-wssMessageHandlers.push({
-    mode: "MSG_DIRECT",
-    func: function(message){
-        chatPutMessage(getMessageDir(message[1][0]), message[1][2], {
-            title:  `${message[1][0]} => ${message[1][1]}`,
-            who:    message[1][0],
-            spec:   1,
-        });
-    }
-});
-wssMessageHandlers.push({
-    mode: "MSG_BLUR",
-    func: function(message){
-        chatPutMessage(getMessageDir(message[1][0]), message[1][1], {
-            title:  message[1][0],
-            who:    message[1][0],
-            spec:   2,
-        });
-    }
-});
-wssMessageHandlers.push({
-    mode: "HISTORY",
-    func: function(message){
-        message[1].forEach(data => {
-            if (data[0] === "MSG") {
-                chatPutMessage(getMessageDir(data[1][0]), data[1][1], {
-                    title:  data[1][0],
-                    who:    data[1][0],
-                });
-            }
-            else if (data[0] === "MSG_BLUR") {
-                chatPutMessage(getMessageDir(data[1][0]), data[1][1], {
-                    title:  data[1][0],
-                    who:    data[1][0],
-                    spec:   2,
-                });
-            }
-        });
-    }
-});
-wssMessageHandlers.push({
-    mode: "RELOAD_CONFIG_DONE",
-    func: function(message){
-        chatPutMessage("server", "Конфигурация завершена", {
-            title: "Конфигурация"
-        });
-    }
-});
+// CHAT MESSAGE HANDLERS
+messageHandlers.notify = (message) => {
+    chatPutMessage("notify", message);
+};
+messageHandlers.msg = (message) => {
+    chatPutMessage(getMessageDir(message[0]), message[1], {
+        title:  message[0],
+        who:    message[0],
+    });
+};
+messageHandlers.msgDirect = (message) => {
+    chatPutMessage(getMessageDir(message[0]), message[2], {
+        title:  `${message[0]} => ${message[1]}`,
+        who:    message[0],
+        spec:   1,
+    });
+};
+messageHandlers.msgBlur = (message) => {
+    chatPutMessage(getMessageDir(message[0]), message[1], {
+        title:  message[0],
+        who:    message[0],
+        spec:   2,
+    });
+};
+messageHandlers.history = (message) => {
+    message.forEach(data => {
+        if (data[0] === "msg:msg") {
+            chatPutMessage(getMessageDir(data[1][0]), data[1][1], {
+                title:  data[1][0],
+                who:    data[1][0],
+            });
+        }
+        else if (data[0] === "msg:blur") {
+            chatPutMessage(getMessageDir(data[1][0]), data[1][1], {
+                title:  data[1][0],
+                who:    data[1][0],
+                spec:   2,
+            });
+        }
+    });
+};
+messageHandlers.cfgreloadOk = (message) => {
+    chatPutMessage("server", "Конфигурация завершена", {
+        title: "Конфигурация"
+    });
+};
 
 // CHAT STAGE HANDLERS
 stages["chat"]["entry"] = function(){

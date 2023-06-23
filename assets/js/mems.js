@@ -40,93 +40,67 @@ function setTotalOnlineCounter(count = "") {
 }
 
 
-// MEMBERS wssMessage HANDLERS
-wssMessageHandlers.push({
-    mode: "COUNT",
-    func: function(message){
-        setTotalOnlineCounter(message[1]);
+// MEMBERS MESSAGE HANDLERS
+messageHandlers.memCount = (message) => {
+    setChatOnlineCounter(message);
+};
+messageHandlers.memList = (message) => {
+    message.forEach(member => {
+        chatNewMem(member);
+    });
+};
+messageHandlers.memDel = (message) => {
+    chatDelMem(message);
+    chatPutMessage("notify", `${message} отключился`);
+};
+messageHandlers.memNew = (message) => {
+    const newMemMsg = `
+    <div 
+    class="msgwho" 
+    style="filter: hue-rotate(${nicknameHue(message)}deg);"
+    >
+    ${message}</div> подключился
+    `; 
+    chatNewMem(message);
+    chatPutMessage("notify", newMemMsg);
+};
+messageHandlers.memKick = (message) => {
+    let msg = `
+    <div 
+    class="msgwho" 
+    style="filter: hue-rotate(${nicknameHue(message)}deg);"
+    >${message}
+    </div> исключен
+    `; 
+    if (message === nickname) {
+        msg = "Вас исключили из чата.";
+        console.warn("Вас исключили из чата.");
+        socket.close();
+        $(".member, .room").remove();
     }
-});
-wssMessageHandlers.push({
-    mode: "ROOM_COUNT",
-    func: function(message){
-        setChatOnlineCounter(message[1]);
-    }
-});
-wssMessageHandlers.push({
-    mode: "MEMBERS",
-    func: function(message){
-        message[1].forEach(member => {
-            chatNewMem(member);
-        });
-    }
-});
-wssMessageHandlers.push({
-    mode: "DEL_MEM",
-    func: function(message){
-        chatDelMem(message[1]);
-        chatPutMessage("notify", `${message[1]} отключился`);
-    }
-});
-wssMessageHandlers.push({
-    mode: "NEW_MEM",
-    func: function(message){
-        const newMemMsg = `
-        <div 
-        class="msgwho" 
-        style="filter: hue-rotate(${nicknameHue(message[1])}deg);"
-        >
-        ${message[1]}</div> подключился
-        `; 
-        chatNewMem(message[1]);
-        chatPutMessage("notify", newMemMsg);
-    }
-});
-wssMessageHandlers.push({
-    mode: "KICK",
-    func: function(message){
-        let msg = `
-        <div 
-        class="msgwho" 
-        style="filter: hue-rotate(${nicknameHue(message[1])}deg);"
-        >${message[1]}
-        </div> исключен
-        `; 
-        if (message[1] === nickname) {
-            msg = "Вас исключили из чата.";
-            console.warn("Вас исключили из чата.");
-            socket.close();
-            $(".member, .room").remove();
-        }
-        chatPutMessage("notify", msg);
-    }
-});
+    chatPutMessage("notify", msg);
+};
+messageHandlers.clientCount = (message) => {
+    setTotalOnlineCounter(message);
+};
+messageHandlers.clientList = (message) => {
+    message.forEach(member => {
+        chatNewMem(member, "#chat-clients");
+    });
+};
+messageHandlers.clientDel = (message) => {
+    chatDelMem(message, "#chat-clients");
+};
+messageHandlers.clientNew = (message) => {
+    const newMemMsg = `
+    <div 
+    class="msgwho" 
+    style="filter: hue-rotate(${nicknameHue(message)}deg);"
+    >
+    ${message}</div> подключился
+    `; 
+    chatNewMem(message, "#chat-clients");
+}
 
-
-wssMessageHandlers.push({
-    mode: "CLIENTS",
-    func: function(message){
-        message[1].forEach(member => {
-            chatNewMem(member, "#chat-clients");
-        });
-    }
-});
-wssMessageHandlers.push({
-    mode: "DEL_CLI",
-    func: function(message){
-        chatDelMem(message[1], "#chat-clients");
-    }
-});
-wssMessageHandlers.push({
-    mode: "NEW_CLI",
-    func: function(message){
-        const newMemMsg = `
-        <div 
-        class="msgwho" 
-        style="filter: hue-rotate(${nicknameHue(message[1])}deg);"
-        >
-        ${message[1]}</div> подключился
-        `; 
-        chatNewMem(message[1], "#chat-clients");
-    }
-});
+// MEMS STAGE HANDLERS
+// MEMS uses CHAT stage

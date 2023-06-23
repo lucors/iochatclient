@@ -1,13 +1,13 @@
 ﻿// COMMON VARIABLES
 let nickname = "";
-let host = window.location.host || "localhost:9000";
+const host = window.location.host || "localhost:9000";
 let protocol = window.location.protocol;
 let hue = 0;
 let socket = null;
-let wssMessageHandlers = []; //[{mode: string, func: function()},...]
+let messageHandlers; //Объект функций-обработчиков сообщений сервера
 let currentStage = null;
 let pingInterval = undefined;
-let stages = {
+const stages = {
     auth: {
         entry: null,
         exit: null,
@@ -21,7 +21,7 @@ let stages = {
         exit: null,
     },
 };
-let flags = {
+const flags = {
     debug: (host === "localhost:9000"),
     admin: false,
 }
@@ -38,17 +38,19 @@ function scrollToBottom(selector) {
         elem.scrollTop = elem.scrollHeight;
     });
 }
-function currentDatetime() {
-    const today = new Date();
-    let hours = today.getHours().toString();
+function humanDatetime(dt) {
+    let hours = dt.getHours().toString();
     if (hours.length < 2) hours = `0${hours}`;
     // 
-    let minutes = today.getMinutes().toString();
+    let minutes = dt.getMinutes().toString();
     if (minutes.length < 2) minutes = `0${minutes}`;
     // 
-    let seconds = today.getSeconds().toString();
+    let seconds = dt.getSeconds().toString();
     if (seconds.length < 2) seconds = `0${seconds}`;
     return `${hours}:${minutes}:${seconds}`;
+}
+function currentDatetime() {
+    return humanDatetime(new Date());
 }
 // Обработка этапов
 function setStage(stage) {
@@ -87,72 +89,39 @@ function wssConnect() {
         socketHost = `http://${host}`;
     }
     socket = io(socketHost, socketOptions);
-    //Обработчики сокета
-    socket.once("connect", wssOpen);
-    socket.on("disconnect", wssClose);
-    socket.on("connect_error", wssError);
-    socket.on("message", wssMessage);
-    socket.on("test:ping", function(message) {
-        console.log(`PING timestamp: ${message}`);
-    })
-}
-function wssRecon() {
-    if (currentStage === "chat" && nickname) {
-        console.warn("Соединение восстановлено");
-        chatPutMessage("notify", "Соединение восстановлено");
-        wssSendName();
-        clearRooms();
-    }
-}
-function wssOpen() {
-    $("#auth-send").click(wssSendName);
-    $(document.body).on("keydown", function (e) {
-        if (!$(document.body).hasClass("auth")) return;
-        switch (e.key) {
-            case ' ': 
-                e.preventDefault();
-                return;
-            case "Enter":
-                return wssSendName();
-            default:
-                $("#auth-input").focus();
-        }
-    });
-    socket.on("connect", wssRecon);
-}
-function wssClose(event) {
-    if ($("#auth-error").html() !== "Ошибка соединения"){
-        $("#auth-error").html("Соединение закрыто. Обновите страницу");
-    }
-    clearInterval(pingInterval);
-    console.warn("Соединение закрыто");
-    chatPutMessage("notify", "Соединение закрыто");
-    setTotalOnlineCounter();
-    setChatOnlineCounter();
-}
-function wssError(event) {
-    $("#auth-error").html("Ошибка соединения");
-    console.error("Ошибка WebSocket");
-    chatPutMessage("notify", "Ошибка WebSocket");
-    socket.close();
-}
-function wssMessage(event) {
-    try {
-        if (flags.debug) console.log(`%cr: ` + event, "color: #bada55");
-        const message = JSON.parse(event);
-        const _done = wssMessageHandlers.some(handler => {
-            if (handler.mode == message[0]) {
-                handler.func(message);
-                return true;
-            }
-        });
-        if (!_done) {
-            console.error(`Ошибка обработки сообщения. mode: ${message[0]}`);
-        }
-    }
-    catch (error) {
-        console.error("Ошибка: ", error);
-    }
+
+    //Привязка обработчиков событий
+    // Общие
+    socket.once("connect",      messageHandlers.onOpen);
+    socket.on("disconnect",     messageHandlers.onClose);
+    socket.on("connect_error",  messageHandlers.onError);
+    socket.on("message",        messageHandlers.onMessage);
+    socket.on("test:ping",      messageHandlers.ping)
+    // Авторизация
+    socket.on("auth:fail",  messageHandlers.authFail);
+    socket.on("auth:ok",    messageHandlers.authOk);
+    socket.on("auth:pass",  messageHandlers.authPass);
+    // Комната
+    socket.on("room:list",          messageHandlers.roomList);
+    socket.on("room:change:fail",   messageHandlers.roomChangeFail);
+    socket.on("room:change:ok",     messageHandlers.roomChangeOk);
+    // Участники
+    socket.on("mem:count",          messageHandlers.memCount);
+    socket.on("mem:list",           messageHandlers.memList);
+    socket.on("mem:del",            messageHandlers.memDel);
+    socket.on("mem:new",            messageHandlers.memNew);
+    socket.on("mem:kick",           messageHandlers.memKick);
+    socket.on("client:count",       messageHandlers.clientCount);
+    socket.on("client:list",        messageHandlers.clientList);
+    socket.on("client:del",         messageHandlers.clientDel);
+    socket.on("client:new",         messageHandlers.clientNew);
+    // Чат
+    socket.on("msg:notify",         messageHandlers.notify);
+    socket.on("msg:msg",            messageHandlers.msg);
+    socket.on("msg:blur",           messageHandlers.msgBlur);
+    socket.on("msg:direct",         messageHandlers.msgDirect);
+    socket.on("history:list",       messageHandlers.history);
+    socket.on("cfg:reload:ok",      messageHandlers.cfgreloadOk);
 }
 function wssSend(mode, data = undefined) {
     if (flags.debug) console.log(`%cs: ${mode}${(data === undefined) ? "" : "," + data}`, "color: #77DDE7");
@@ -160,19 +129,58 @@ function wssSend(mode, data = undefined) {
     return socket.emit(mode, data);
 }
 
-// COMMON wssMessage HANDLERS
-// wssMessageHandlers.push({
-//     mode: "PING",
-//     func: function(message){
-//         console.log(`PING timestamp: ${message[1]}`);
-//     }
-// });
-wssMessageHandlers.push({
-    mode: "ERROR",
-    func: function(message){
-        console.error(`SERVER ERROR: ${message[1]}`);
+// COMMON MESSAGE HANDLERS
+messageHandlers = {
+    ping: (timestamp) => {
+        console.log(`PING timestamp: ${timestamp}`);
+    },
+    onError: (event) => {
+        $("#auth-error").html("Ошибка соединения");
+        console.error("Ошибка WebSocket");
+        chatPutMessage("notify", "Ошибка WebSocket");
+        socket.close();
+    },
+    onOpen: () => {
+        $("#auth-send").click(wssSendName);
+        $(document.body).on("keydown", function (e) {
+            if (!$(document.body).hasClass("auth")) return;
+            switch (e.key) {
+                case ' ': 
+                    e.preventDefault();
+                    return;
+                case "Enter":
+                    return wssSendName();
+                default:
+                    $("#auth-input").focus();
+            }
+        });
+        socket.on("connect", messageHandlers.onRecon);
+    },
+    onRecon: () => {
+        if (currentStage === "chat" && nickname) {
+            console.warn("Соединение восстановлено");
+            chatPutMessage("notify", "Соединение восстановлено");
+            wssSendName();
+            clearRooms();
+        }
+    },
+    onClose: (event) => {
+        if ($("#auth-error").html() !== "Ошибка соединения"){
+            $("#auth-error").html("Соединение закрыто. Обновите страницу");
+        }
+        clearInterval(pingInterval);
+        console.warn("Соединение закрыто");
+        chatPutMessage("notify", "Соединение закрыто");
+        setTotalOnlineCounter();
+        setChatOnlineCounter();
+    },
+    onMessage: (raw) => {
+        console.warn("Неподдерживаемое сообщение от сервера: " + raw);
+    },
+    error: (message) => {
+        console.error(`SERVER ERROR: ${message}`);
     }
-});
+}
 
 
 // COMMON STAGE HANDLERS

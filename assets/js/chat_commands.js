@@ -4,7 +4,7 @@ chatCommandsHandlers.push({
     admin: false,
     func: function(message){
         let helpText = `
-            Доступны следующие команды:<br>
+            Вам доступны следующие команды:<br>
             @blur &lt;text&gt; — <i>отправить размытое сообщение;</i><br>
             @direct &lt;user&gt; &lt;text&gt; — <i>отправить личное сообщение;</i><br>
         `;

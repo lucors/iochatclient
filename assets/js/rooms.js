@@ -22,35 +22,25 @@ function clearRooms() {
 // ROOMS WEBSOCKET STUFF
 
 
-// ROOMS wssMessage HANDLERS
-wssMessageHandlers.push({
-    mode: "ROOMS",
-    func: function(message){
-        message[1].forEach(room => {
-            putRoom(room);
-        });
-    }
-});
-wssMessageHandlers.push({
-    mode: "ROOM_CHANGE_FAIL",
-    func: function(message){
-        console.error(`ROOM_CHANGE_FAIL: ${message[1]}`);
-        $("#chat-rooms-error").html(message[1]);
-    }
-});
-wssMessageHandlers.push({
-    mode: "ROOM_CHANGE_OK",
-    func: function(message){
-        $("#chat-messages, #chat-members").empty();
-        $("#chat-rooms .room")
-            .removeClass("current")
-            .attr("style", "");
-        $(`.room[rid=${message[1]}]`)
-            .addClass("current")
-            .css({"filter": `hue-rotate(${hue}deg)`});
-    }
-});
-
+// ROOMS MESSAGE HANDLERS
+messageHandlers.roomList = (message) => {
+    message.forEach(room => {
+        putRoom(room);
+    });
+};
+messageHandlers.roomChangeFail = (message) => {
+    console.error(`ROOM_CHANGE_FAIL: ${message}`);
+    $("#chat-rooms-error").html(message);
+};
+messageHandlers.roomChangeOk = (message) => {
+    $("#chat-messages, #chat-members").empty();
+    $("#chat-rooms .room")
+        .removeClass("current")
+        .attr("style", "");
+    $(`.room[rid=${message}]`)
+        .addClass("current")
+        .css({"filter": `hue-rotate(${hue}deg)`});
+};
 
 // ROOMS STAGE HANDLERS
 // ROOMS uses CHAT stage

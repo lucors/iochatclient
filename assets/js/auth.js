@@ -21,35 +21,26 @@ function wssSendName() {
     wssSend("auth:auth", nickname);
 }
 
-// AUTH wssMessage HANDLERS
-wssMessageHandlers.push({
-    mode: "AUTH_FAIL",
-    func: function(message){
-        console.error(`AUTH_FAIL: ${message[1]}`);
+// AUTH MESSAGE HANDLERS
+messageHandlers.authFail = (message) => {
+    console.error(`AUTH_FAIL: ${message}`);
+    nickname = "";
+    $("#auth-error").html(message);
+};
+messageHandlers.authOk = (message) => {
+    flags.admin = message;
+    setStage("chat"); 
+}
+messageHandlers.authPass = (message) => {
+    const pass = prompt(message);
+    if (!pass) {
+        console.error("Пароль не задан");
         nickname = "";
-        $("#auth-error").html(message[1]);
+        $("#auth-error").html("Пароль не задан");
+        return;
     }
-});
-wssMessageHandlers.push({
-    mode: "AUTH_OK",
-    func: function(message){
-        flags.admin = message[1];
-        setStage("chat"); 
-    }
-});
-wssMessageHandlers.push({
-    mode: "AUTH_PASS",
-    func: function(message){
-        const pass = prompt(message[1]);
-        if (!pass) {
-            console.error("Пароль не задан");
-            nickname = "";
-            $("#auth-error").html("Пароль не задан");
-            return;
-        }
-        wssSend("auth:pass", [nickname, hashCode(pass)]);
-    }
-});
+    wssSend("auth:pass", [nickname, hashCode(pass)]);
+};
 
 // AUTH STAGE HANDLERS
 stages["auth"]["entry"] = function(){
