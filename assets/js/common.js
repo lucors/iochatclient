@@ -160,7 +160,12 @@ messageHandlers = {
         if (currentStage === "chat" && nickname) {
             console.warn("Соединение восстановлено");
             chatPutMessage("notify", "Соединение восстановлено");
-            wssSendName();
+            if (flags.admin) {
+                wssSendPass("", true);
+            }
+            else {
+                wssSendName();
+            }
             clearRooms();
         }
     },

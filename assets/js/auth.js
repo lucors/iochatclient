@@ -1,5 +1,5 @@
 // AUTH VARIABLES
-
+let passhash = 0;
 
 // AUTH UTILS
 
@@ -20,6 +20,19 @@ function wssSendName() {
     }
     wssSend("auth:auth", nickname);
 }
+function wssSendPass(promptMessage, cache = false) {
+    if (!cache) {
+        const pass = prompt(promptMessage);
+        if (!pass) {
+            console.error("Пароль не задан");
+            nickname = "";
+            $("#auth-error").html("Пароль не задан");
+            return;
+        }
+        passhash = hashCode(pass);
+    }
+    wssSend("auth:pass", [nickname, passhash]);
+}
 
 // AUTH MESSAGE HANDLERS
 messageHandlers.authFail = (message) => {
@@ -32,14 +45,7 @@ messageHandlers.authOk = (message) => {
     setStage("chat"); 
 }
 messageHandlers.authPass = (message) => {
-    const pass = prompt(message);
-    if (!pass) {
-        console.error("Пароль не задан");
-        nickname = "";
-        $("#auth-error").html("Пароль не задан");
-        return;
-    }
-    wssSend("auth:pass", [nickname, hashCode(pass)]);
+    wssSendPass(message, false);
 };
 
 // AUTH STAGE HANDLERS
