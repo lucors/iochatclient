@@ -18,6 +18,10 @@ function chatDelMem(who, root = "#chat-members") {
     $(`${root} .member[who="${who}"]`)
         .each((i, elem) => elem.remove());
 }
+function chatClearMem(root = "#chat-members") {
+    $(`${root} .member`)
+        .each((i, elem) => elem.remove());
+}
 function setChatOnlineCounter(count = "") {
     if (count === "") {
         $("#chat-members-count-title").html("Офлайн");
@@ -45,6 +49,7 @@ messageHandlers.memCount = (message) => {
     setChatOnlineCounter(message);
 };
 messageHandlers.memList = (message) => {
+    if (!message.length) return chatClearMem();
     message.forEach(member => {
         chatNewMem(member);
     });
@@ -84,6 +89,7 @@ messageHandlers.clientCount = (message) => {
     setTotalOnlineCounter(message);
 };
 messageHandlers.clientList = (message) => {
+    if (!message.length) return chatClearMem("#chat-clients");
     message.forEach(member => {
         chatNewMem(member, "#chat-clients");
     });

@@ -89,6 +89,7 @@ function wssConnect() {
         socketHost = `http://${host}`;
     }
     socket = io(socketHost, socketOptions);
+    
 
     //Привязка обработчиков событий
     // Общие
@@ -141,6 +142,15 @@ messageHandlers = {
         socket.close();
     },
     onOpen: () => {
+        var onevent = socket.onevent;
+        socket.onevent = function (packet) {
+            var args = packet.data || [];
+            if (flags.debug && !args[0].includes("test:")) {
+                console.log(`%cr: ` + JSON.stringify(args), "color: #bada55");
+            }
+            onevent.call(this, packet);
+        }
+
         $("#auth-send").click(wssSendName);
         $(document.body).on("keydown", function (e) {
             if (!$(document.body).hasClass("auth")) return;
@@ -166,7 +176,6 @@ messageHandlers = {
             else {
                 wssSendName();
             }
-            clearRooms();
         }
     },
     onClose: (event) => {
@@ -176,8 +185,11 @@ messageHandlers = {
         clearInterval(pingInterval);
         console.warn("Соединение закрыто");
         chatPutMessage("notify", "Соединение закрыто");
+        clearRooms();
         setTotalOnlineCounter();
         setChatOnlineCounter();
+        chatClearMem();
+        chatClearMem("#chat-clients");
     },
     onMessage: (raw) => {
         console.warn("Неподдерживаемое сообщение от сервера: " + raw);
