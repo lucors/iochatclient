@@ -93,15 +93,15 @@ function wssConnect() {
 
     //Привязка обработчиков событий
     // Общие
-    socket.once("connect",      messageHandlers.onOpen);
-    socket.on("disconnect",     messageHandlers.onClose);
-    socket.on("connect_error",  messageHandlers.onError);
-    socket.on("message",        messageHandlers.onMessage);
-    socket.on("test:ping",      messageHandlers.ping)
+    socket.once("connect",          messageHandlers.onOpen);
+    socket.on("disconnect",         messageHandlers.onClose);
+    socket.on("connect_error",      messageHandlers.onError);
+    socket.on("message",            messageHandlers.onMessage);
+    socket.on("test:ping",          messageHandlers.ping)
     // Авторизация
-    socket.on("auth:fail",  messageHandlers.authFail);
-    socket.on("auth:ok",    messageHandlers.authOk);
-    socket.on("auth:pass",  messageHandlers.authPass);
+    socket.on("auth:fail",          messageHandlers.authFail);
+    socket.on("auth:ok",            messageHandlers.authOk);
+    socket.on("auth:pass",          messageHandlers.authPass);
     // Комната
     socket.on("room:list",          messageHandlers.roomList);
     socket.on("room:change:fail",   messageHandlers.roomChangeFail);
