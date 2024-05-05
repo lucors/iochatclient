@@ -26,11 +26,24 @@
     </head>
 
     <body>
+        <div id="prompt-modal">
+            <div id="prompt-modal-content">
+                <div id="prompt-message"></div>
+        
+                <div id="prompt-send-form" class="chat-style">
+                    <input id="prompt-input" type="text" name="message" maxlength="2000" autocomplete="off">
+                    <div id="prompt-send" class="flex-center">
+                        <img src="assets/img/chat-send.svg">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="auth-wrapper">
             <img id="wsc-logo" src="assets/img/ioclogo.svg">
             <!-- Nickname Sending Form -->
             <div id="auth-send-form" class="chat-style">
-                <input id="auth-input" type="text" name="message" maxlength="50" placeholder="Имя пользователя">
+                <input id="auth-input" type="text" name="message" maxlength="50" placeholder="Имя пользователя" autocomplete="off">
                 <div id="auth-send" class="flex-center">
                     <img src="assets/img/chat-send.svg">
                 </div>
@@ -58,8 +71,8 @@
 
                 <!-- Chat msg Sending Form -->
                 <div id="chat-send-form" class="chat-style">
-                    <input id="chat-input-hint" type="text" name="message" maxlength="2000">
-                    <input id="chat-input" type="text" name="message" maxlength="2000">
+                    <input id="chat-input-hint" type="text" name="message" maxlength="2000" autocomplete="off">
+                    <input id="chat-input" type="text" name="message" maxlength="2000" autocomplete="off">
                     <div id="chat-send" class="flex-center">
                         <img src="assets/img/chat-send.svg">
                     </div>

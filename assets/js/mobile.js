@@ -3,9 +3,10 @@
 
 // MOBILE UTILS
 function toggleRooms() {
-    $("#mems-wrapper").removeClass("active");
+    $("#mems-wrapper, .action").removeClass("active");
     if (!$("#rooms-wrapper, #mems-wrapper").hasClass("active")) {
         $("#chat-wrapper").addClass("hide");
+        $(this).addClass("active");
     }
     else {
         $("#chat-wrapper").removeClass("hide");
@@ -13,9 +14,10 @@ function toggleRooms() {
     $("#rooms-wrapper").toggleClass("active");
 }
 function toggleMembers() {
-    $("#rooms-wrapper").removeClass("active");
+    $("#rooms-wrapper, .action").removeClass("active");
     if (!$("#rooms-wrapper, #mems-wrapper").hasClass("active")) {
         $("#chat-wrapper").addClass("hide");
+        $(this).addClass("active");
     }
     else {
         $("#chat-wrapper").removeClass("hide");
